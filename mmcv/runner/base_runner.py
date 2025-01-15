@@ -347,11 +347,11 @@ class BaseRunner(metaclass=ABCMeta):
                resume_optimizer=True,
                map_location='default'):
         if map_location == 'default':
-            if torch.cuda.is_available():
-                device_id = torch.cuda.current_device()
+            if torch.musa.is_available():
+                device_id = torch.musa.current_device()
                 checkpoint = self.load_checkpoint(
                     checkpoint,
-                    map_location=lambda storage, loc: storage.cuda(device_id))
+                    map_location=lambda storage, loc: storage.musa(device_id))
             else:
                 checkpoint = self.load_checkpoint(checkpoint)
         else:

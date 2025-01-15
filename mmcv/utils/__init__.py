@@ -40,10 +40,10 @@ else:
     from .logging import get_logger, print_log
     from .parrots_jit import jit, skip_no_elena
     from .parrots_wrapper import (
-        TORCH_VERSION, BuildExtension, CppExtension, CUDAExtension, DataLoader,
+        TORCH_VERSION, BuildExtension, CppExtension, MUSAExtension, DataLoader,
         PoolDataLoader, SyncBatchNorm, _AdaptiveAvgPoolNd, _AdaptiveMaxPoolNd,
         _AvgPoolNd, _BatchNorm, _ConvNd, _ConvTransposeMixin, _InstanceNorm,
-        _MaxPoolNd, get_build_config, is_rocm_pytorch, _get_cuda_home)
+        _MaxPoolNd, get_build_config, is_rocm_pytorch, _get_musa_home)
     from .registry import Registry, build_from_cfg
     from .trace import is_jit_tracing
     from .hub import load_url
@@ -58,7 +58,7 @@ else:
         'build_from_cfg', 'Timer', 'TimerError', 'check_time', 'SyncBatchNorm',
         '_AdaptiveAvgPoolNd', '_AdaptiveMaxPoolNd', '_AvgPoolNd', '_BatchNorm',
         '_ConvNd', '_ConvTransposeMixin', '_InstanceNorm', '_MaxPoolNd',
-        'get_build_config', 'BuildExtension', 'CppExtension', 'CUDAExtension',
+        'get_build_config', 'BuildExtension', 'CppExtension', 'MUSAExtension',
         'DataLoader', 'PoolDataLoader', 'TORCH_VERSION',
         'deprecated_api_warning', 'digit_version', 'get_git_hash',
         'import_modules_from_strings', 'jit', 'skip_no_elena',
@@ -66,5 +66,5 @@ else:
         'assert_dict_has_keys', 'assert_keys_equal', 'assert_is_norm_layer',
         'assert_params_all_zeros', 'check_python_script',
         'is_method_overridden', 'is_jit_tracing', 'is_rocm_pytorch',
-        '_get_cuda_home', 'load_url', 'has_method'
+        '_get_musa_home', 'load_url', 'has_method'
     ]

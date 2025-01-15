@@ -16,7 +16,10 @@ def scatter(inputs, target_gpus, dim=0):
     def scatter_map(obj):
         if isinstance(obj, torch.Tensor):
             if target_gpus != [-1]:
-                return OrigScatter.apply(target_gpus, None, dim, obj)
+                obj_musa = obj.musa()
+                return tuple([obj_musa])
+                # return OrigScatter.apply(target_gpus, None, dim, obj)
+
             else:
                 # for CPU inference we use self-implemented scatter
                 return Scatter.forward(target_gpus, obj)
@@ -24,7 +27,9 @@ def scatter(inputs, target_gpus, dim=0):
             if obj.cpu_only:
                 return obj.data
             else:
-                return Scatter.forward(target_gpus, obj.data)
+                scattered_data = scatter_map(obj.data)[0]
+                return scattered_data
+                # return Scatter.forward(target_gpus, obj.data)
         if isinstance(obj, tuple) and len(obj) > 0:
             return list(zip(*map(scatter_map, obj)))
         if isinstance(obj, list) and len(obj) > 0:

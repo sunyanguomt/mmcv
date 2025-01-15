@@ -21,9 +21,9 @@ def collect_env():
 
             - sys.platform: The variable of ``sys.platform``.
             - Python: Python version.
-            - CUDA available: Bool, indicating if CUDA is available.
+            - MUSA available: Bool, indicating if MUSA is available.
             - GPU devices: Device type of each GPU.
-            - CUDA_HOME (optional): The env var ``CUDA_HOME``.
+            - MUSA_HOME (optional): The env var ``MUSA_HOME``.
             - NVCC (optional): NVCC version.
             - GCC: GCC version, "n/a" if GCC is not installed.
             - PyTorch: PyTorch version.
@@ -33,35 +33,35 @@ def collect_env():
             - OpenCV: OpenCV version.
             - MMCV: MMCV version.
             - MMCV Compiler: The GCC version for compiling MMCV ops.
-            - MMCV CUDA Compiler: The CUDA version for compiling MMCV ops.
+            - MMCV MUSA Compiler: The MUSA version for compiling MMCV ops.
     """
     env_info = {}
     env_info['sys.platform'] = sys.platform
     env_info['Python'] = sys.version.replace('\n', '')
 
-    cuda_available = torch.cuda.is_available()
-    env_info['CUDA available'] = cuda_available
+    musa_available = torch.musa.is_available()
+    env_info['MUSA available'] = musa_available
 
-    if cuda_available:
+    if musa_available:
         devices = defaultdict(list)
-        for k in range(torch.cuda.device_count()):
-            devices[torch.cuda.get_device_name(k)].append(str(k))
+        for k in range(torch.musa.device_count()):
+            devices[torch.musa.get_device_name(k)].append(str(k))
         for name, device_ids in devices.items():
             env_info['GPU ' + ','.join(device_ids)] = name
 
-        from mmcv.utils.parrots_wrapper import _get_cuda_home
-        CUDA_HOME = _get_cuda_home()
-        env_info['CUDA_HOME'] = CUDA_HOME
+        from mmcv.utils.parrots_wrapper import _get_musa_home
+        MUSA_HOME = _get_musa_home()
+        env_info['MUSA_HOME'] = MUSA_HOME
 
-        if CUDA_HOME is not None and osp.isdir(CUDA_HOME):
+        if MUSA_HOME is not None and osp.isdir(MUSA_HOME):
             try:
-                nvcc = osp.join(CUDA_HOME, 'bin/nvcc')
-                nvcc = subprocess.check_output(
-                    f'"{nvcc}" -V | tail -n1', shell=True)
-                nvcc = nvcc.decode('utf-8').strip()
+                mcc = osp.join(MUSA_HOME, 'bin/mcc')
+                mcc = subprocess.check_output(
+                    f'"{mcc}" -V | tail -n1', shell=True)
+                mcc = mcc.decode('utf-8').strip()
             except subprocess.SubprocessError:
-                nvcc = 'Not Available'
-            env_info['NVCC'] = nvcc
+                mcc = 'Not Available'
+            env_info['NVCC'] = mcc
 
     try:
         gcc = subprocess.check_output('gcc --version | head -n1', shell=True)
@@ -84,12 +84,12 @@ def collect_env():
     env_info['MMCV'] = mmcv.__version__
 
     try:
-        from mmcv.ops import get_compiler_version, get_compiling_cuda_version
+        from mmcv.ops import get_compiler_version, get_compiling_musa_version
     except ModuleNotFoundError:
         env_info['MMCV Compiler'] = 'n/a'
-        env_info['MMCV CUDA Compiler'] = 'n/a'
+        env_info['MMCV MUSA Compiler'] = 'n/a'
     else:
         env_info['MMCV Compiler'] = get_compiler_version()
-        env_info['MMCV CUDA Compiler'] = get_compiling_cuda_version()
+        env_info['MMCV MUSA Compiler'] = get_compiling_musa_version()
 
     return env_info

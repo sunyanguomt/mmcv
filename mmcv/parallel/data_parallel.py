@@ -20,7 +20,7 @@ class MMDataParallel(DataParallel):
         train with multiple GPUs, please use MMDistributedDataParallel
         instead. If you have multiple GPUs and you just want to use
         MMDataParallel, you can set the environment variable
-        ``CUDA_VISIBLE_DEVICES=0`` or instantiate ``MMDataParallel`` with
+        ``MUSA_VISIBLE_DEVICES=0`` or instantiate ``MMDataParallel`` with
         ``device_ids=[0]``.
 
     Args:

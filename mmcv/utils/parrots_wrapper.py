@@ -18,7 +18,7 @@ def is_rocm_pytorch() -> bool:
     return is_rocm
 
 
-def _get_cuda_home():
+def _get_musa_home():
     if TORCH_VERSION == 'parrots':
         from parrots.utils.build_extension import CUDA_HOME
     else:
@@ -26,7 +26,8 @@ def _get_cuda_home():
             from torch.utils.cpp_extension import ROCM_HOME
             CUDA_HOME = ROCM_HOME
         else:
-            from torch.utils.cpp_extension import CUDA_HOME
+            from torch_musa.utils.musa_extension import MUSA_HOME
+            CUDA_HOME = MUSA_HOME
     return CUDA_HOME
 
 
@@ -60,10 +61,11 @@ def _get_extension():
         from parrots.utils.build_extension import BuildExtension, Extension
         CppExtension = partial(Extension, cuda=False)
         CUDAExtension = partial(Extension, cuda=True)
+        return BuildExtension, CppExtension, CUDAExtension
     else:
-        from torch.utils.cpp_extension import (BuildExtension, CppExtension,
-                                               CUDAExtension)
-    return BuildExtension, CppExtension, CUDAExtension
+        from torch_musa.utils.musa_extension import (BuildExtension, MUSAExtension)
+        from torch.utils.cpp_extension import CppExtension
+        return BuildExtension, CppExtension, MUSAExtension
 
 
 def _get_pool():
@@ -91,7 +93,7 @@ def _get_norm():
 
 _ConvNd, _ConvTransposeMixin = _get_conv()
 DataLoader, PoolDataLoader = _get_dataloader()
-BuildExtension, CppExtension, CUDAExtension = _get_extension()
+BuildExtension, CppExtension, MUSAExtension = _get_extension()
 _BatchNorm, _InstanceNorm, SyncBatchNorm_ = _get_norm()
 _AdaptiveAvgPoolNd, _AdaptiveMaxPoolNd, _AvgPoolNd, _MaxPoolNd = _get_pool()
 

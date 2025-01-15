@@ -20,8 +20,8 @@ def scatter(input, devices, streams=None):
         # TODO: copy to a pinned buffer first (if copying from CPU)
         stream = streams[0] if output.numel() > 0 else None
         if devices != [-1]:
-            with torch.cuda.device(devices[0]), torch.cuda.stream(stream):
-                output = output.cuda(devices[0], non_blocking=True)
+            with torch.musa.device(devices[0]), torch.musa.stream(stream):
+                output = output.musa(devices[0], non_blocking=True)
         else:
             # unsqueeze the first dimension thus the tensor's shape is the
             # same as those scattered with GPU.
@@ -40,8 +40,8 @@ def synchronize_stream(output, devices, streams):
                                    [streams[i]])
     elif isinstance(output, torch.Tensor):
         if output.numel() != 0:
-            with torch.cuda.device(devices[0]):
-                main_stream = torch.cuda.current_stream()
+            with torch.musa.device(devices[0]):
+                main_stream = torch.musa.current_stream()
                 main_stream.wait_stream(streams[0])
                 output.record_stream(main_stream)
     else:
@@ -56,7 +56,7 @@ def get_input_device(input):
                 return input_device
         return -1
     elif isinstance(input, torch.Tensor):
-        return input.get_device() if input.is_cuda else -1
+        return input.get_device() if input.is_musa else -1
     else:
         raise Exception(f'Unknown type {type(input)}.')
 
@@ -70,10 +70,27 @@ class Scatter:
         if input_device == -1 and target_gpus != [-1]:
             # Perform CPU to GPU copies in a background stream
             streams = [_get_stream(device) for device in target_gpus]
+            # streams = [_get_stream(torch.device(f'musa:{device}')) for device in target_gpus]
 
         outputs = scatter(input, target_gpus, streams)
         # Synchronize with the copy stream
         if streams is not None:
             synchronize_stream(outputs, target_gpus, streams)
+        # output = []
+        # for i in input:
+        #     print('&&&&&&&&&&&&&&&&&&&&&&&&&')
+        #     input = i.musa()
+        #     input_device = get_input_device(input)
+        #     streams = None
+        #     if input_device == -1 and target_gpus != [-1]:
+        #         # Perform CPU to GPU copies in a background stream
+        #         streams = [_get_stream(device) for device in target_gpus]
+
+        #     outputs = scatter(input, target_gpus, streams)
+        #     # Synchronize with the copy stream
+        #     if streams is not None:
+        #         synchronize_stream(outputs, target_gpus, streams)
+        #     output.append(outputs)
+        # outputs = output
 
         return tuple(outputs)

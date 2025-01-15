@@ -19,6 +19,12 @@ except ModuleNotFoundError:
     cmd_class = {}
     print('Skip building ext ops due to the absence of torch.')
 
+try:
+    from torch_musa.utils.musa_extension import MUSAExtension,BuildExtension
+    cmd_class = {'build_ext': BuildExtension}
+except ModuleNotFoundError:
+    pass
+
 
 def choose_requirement(primary, secondary):
     """If some version of primary requirement installed, return primary, else
@@ -175,7 +181,7 @@ def get_extensions():
             libraries=libraries)
         extensions.append(ext_ops)
 
-    if os.getenv('MMCV_WITH_OPS', '0') == '0':
+    if os.getenv('MMCV_WITH_OPS', '1') == '0':
         return extensions
 
     if EXT_TYPE == 'parrots':
@@ -241,7 +247,7 @@ def get_extensions():
         # to compile those cpp files, so there is no need to add the
         # argument
         if platform.system() != 'Windows':
-            extra_compile_args['cxx'] = ['-std=c++14']
+            extra_compile_args['cxx'] = ['-std=c++17']
 
         include_dirs = []
 
@@ -283,6 +289,20 @@ def get_extensions():
             extension = CUDAExtension
             include_dirs.append(os.path.abspath('./mmcv/ops/csrc/common'))
             include_dirs.append(os.path.abspath('./mmcv/ops/csrc/common/cuda'))
+            
+        elif hasattr(torch, 'musa') or os.getenv('FORCE_MUSA', '0') == '1':
+            from torch_musa.testing import get_musa_arch
+            define_macros += [('MMCV_WITH_MUSA', None),
+                              ('MUSA_ARCH', str(get_musa_arch()))]
+            os.environ['MUSA_ARCH'] = str(get_musa_arch())
+            op_files = glob.glob('./mmcv/ops/csrc_musa/pytorch/*.cpp') + \
+                glob.glob('./mmcv/ops/csrc_musa/pytorch/cpu/*.cpp') + \
+                glob.glob('./mmcv/ops/csrc_musa/pytorch/cuda/*.mu') + \
+                glob.glob('./mmcv/ops/csrc_musa/pytorch/cuda/*.cpp')
+            include_dirs.append(os.path.abspath('./mmcv/ops/csrc_musa/pytorch'))
+            include_dirs.append(os.path.abspath('./mmcv/ops/csrc_musa/common'))
+            include_dirs.append(os.path.abspath('./mmcv/ops/csrc_musa/common/cuda'))
+            extension = MUSAExtension
         else:
             print(f'Compiling {ext_name} without CUDA')
             op_files = glob.glob('./mmcv/ops/csrc/pytorch/*.cpp') + \
@@ -354,7 +374,7 @@ def get_extensions():
 
 
 setup(
-    name='mmcv' if os.getenv('MMCV_WITH_OPS', '0') == '0' else 'mmcv-full',
+    name='mmcv' if os.getenv('MMCV_WITH_OPS', '1') == '0' else 'mmcv-full',
     version=get_version(),
     description='OpenMMLab Computer Vision Foundation',
     keywords='computer vision',

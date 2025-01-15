@@ -34,7 +34,8 @@ class SigmoidFocalLossFunction(Function):
                 weight=None,
                 reduction='mean'):
 
-        assert isinstance(target, (torch.LongTensor, torch.cuda.LongTensor))
+        # assert isinstance(target, (torch.LongTensor, torch.cuda.LongTensor))
+        assert target.dtype==torch.int64
         assert input.dim() == 2
         assert target.dim() == 1
         assert input.size(0) == target.size(0)
@@ -128,7 +129,8 @@ class SoftmaxFocalLossFunction(Function):
                 weight=None,
                 reduction='mean'):
 
-        assert isinstance(target, (torch.LongTensor, torch.cuda.LongTensor))
+        # assert isinstance(target, (torch.LongTensor, torch.cuda.LongTensor))
+        assert target.dtype==torch.int64
         assert input.dim() == 2
         assert target.dim() == 1
         assert input.size(0) == target.size(0)
