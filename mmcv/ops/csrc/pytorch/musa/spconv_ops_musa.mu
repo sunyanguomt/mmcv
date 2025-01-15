@@ -8,6 +8,7 @@
 #include <utils/spconv/spconv/reordering.h>
 
 #include "pytorch_musa_helper.hpp"
+#include <iostream>
 
 template <unsigned NDim>
 std::vector<torch::Tensor> GetIndicePairsForwardMUSAKernelLauncher(
@@ -256,6 +257,7 @@ torch::Tensor IndiceConvForwardMUSAKernelLauncher(
   auto kernelVolume = indicePairs.size(0);
   auto numInPlanes = features.size(1);
   auto numOutPlanes = filters.size(ndim + 1);
+  // auto indicePairNumCpu = indiceNum;
   auto indicePairNumCpu = indiceNum.to({torch::kCPU});
   auto indicePairMaxSizeIter =
       std::max_element(indicePairNumCpu.data_ptr<int>(),

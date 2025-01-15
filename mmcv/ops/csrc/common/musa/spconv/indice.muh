@@ -18,6 +18,7 @@
 #include <utils/spconv/tensorview/tensorview.h>
 
 #include <utils/spconv/tensorview/helper_kernel.muh>
+#include <stdio.h>
 
 template <typename Index, typename IndexGrid, unsigned NDim,
           int KernelMaxVolume = 256>

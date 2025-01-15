@@ -29,6 +29,8 @@
 
 #include "pytorch_musa_helper.hpp"
 
+#include<iostream>
+
 namespace functor {
 template <typename Index, typename IndexGrid, unsigned NDim>
 struct CreateConvIndicePairFunctorP1<tv::TorchGPU, Index, IndexGrid, NDim> {
@@ -48,13 +50,15 @@ struct CreateConvIndicePairFunctorP1<tv::TorchGPU, Index, IndexGrid, NDim> {
     auto numActIn = indicesIn.dim(0);
     if (numActIn == 0) return 0;
     if (transpose)
-      prepareDeConvIndicePairsKernel<Index, IndexGrid, NDim, 4096>
+      // prepareDeConvIndicePairsKernel<Index, IndexGrid, NDim, 4096>
+      prepareDeConvIndicePairsKernel<Index, IndexGrid, NDim, 256>
           <<<tv::launch::getBlocks(numActIn), tv::launch::MUSA_NUM_THREADS, 0,
              d.getStream()>>>(indicesIn, indicesOut, gridsOut, indicePairs,
                               indiceNum, indicePairUnique, kernelSize, stride,
                               padding, dilation, outSpatialShape);
     else
-      prepareIndicePairsKernel<Index, IndexGrid, NDim, 4096>
+      // prepareIndicePairsKernel<Index, IndexGrid, NDim, 4096>
+      prepareIndicePairsKernel<Index, IndexGrid, NDim, 256>
           <<<tv::launch::getBlocks(numActIn), tv::launch::MUSA_NUM_THREADS, 0,
              d.getStream()>>>(indicesIn, indicesOut, gridsOut, indicePairs,
                               indiceNum, indicePairUnique, kernelSize, stride,
@@ -114,17 +118,17 @@ struct CreateSubMIndicePairFunctor<tv::TorchGPU, Index, IndexGrid, NDim> {
                    bool transpose, bool resetGrid) {
     auto numActIn = indicesIn.dim(0);
     if (numActIn == 0) return 0;
-    prepareSubMGridKernel<Index, IndexGrid, NDim>
+    prepareSubMGridKernel_musa<Index, IndexGrid, NDim>
         <<<tv::launch::getBlocks(numActIn), tv::launch::MUSA_NUM_THREADS, 0,
            d.getStream()>>>(indicesIn, gridsOut, outSpatialShape);
     TV_CHECK_MUSA_ERR();
-    getSubMIndicePairsKernel<Index, IndexGrid, NDim, 4096>
+    // getSubMIndicePairsKernel_musa<Index, IndexGrid, NDim, 4096>
+    getSubMIndicePairsKernel_musa<Index, IndexGrid, NDim, 256>
         <<<tv::launch::getBlocks(numActIn), tv::launch::MUSA_NUM_THREADS, 0,
            d.getStream()>>>(indicesIn, gridsOut, indicePairs, indiceNum,
                             kernelSize, stride, padding, dilation,
                             outSpatialShape);
     TV_CHECK_MUSA_ERR();
-
     if (resetGrid) {
       resetGridSubMKernel<Index, IndexGrid, NDim>
           <<<tv::launch::getBlocks(numActIn), tv::launch::MUSA_NUM_THREADS, 0,
