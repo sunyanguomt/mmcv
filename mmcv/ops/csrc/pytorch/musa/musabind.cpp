@@ -871,15 +871,15 @@ REGISTER_DEVICE_IMPL(ms_deform_attn_impl_forward, MUSA,
 REGISTER_DEVICE_IMPL(ms_deform_attn_impl_backward, MUSA,
                      ms_deform_attn_musa_backward);
 
-// Tensor NMSMUSAKernelLauncher(Tensor boxes, Tensor scores, float iou_threshold,
-//                              int offset);
+Tensor NMSMUSAKernelLauncher(Tensor boxes, Tensor scores, float iou_threshold,
+                             int offset);
 
-// Tensor nms_musa(Tensor boxes, Tensor scores, float iou_threshold, int offset) {
-//   return NMSMUSAKernelLauncher(boxes, scores, iou_threshold, offset);
-// }
+Tensor nms_musa(Tensor boxes, Tensor scores, float iou_threshold, int offset) {
+  return NMSMUSAKernelLauncher(boxes, scores, iou_threshold, offset);
+}
 
-// Tensor nms_impl(Tensor boxes, Tensor scores, float iou_threshold, int offset);
-// REGISTER_DEVICE_IMPL(nms_impl, MUSA, nms_musa);
+Tensor nms_impl(Tensor boxes, Tensor scores, float iou_threshold, int offset);
+REGISTER_DEVICE_IMPL(nms_impl, MUSA, nms_musa);
 
 // void PointsInBoxesPartForwardMUSAKernelLauncher(int batch_size, int boxes_num,
 //                                                 int pts_num, const Tensor boxes,
