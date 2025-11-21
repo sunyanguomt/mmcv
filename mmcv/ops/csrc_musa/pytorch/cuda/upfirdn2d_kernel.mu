@@ -13,7 +13,13 @@
 #include <musa_runtime.h>
 #include <torch/types.h>
 
-#include <ATen/musa/MUSA_PORT_ApplyUtils.muh>
+#if defined(TORCH_MUSA_2) && TORCH_MUSA_2
+    #pragma message("[MUSA HELPER] Using <ATen/musa/MUSAApplyUtils.muh> for torch_musa > 2.0.0")
+    #include <ATen/musa/MUSAApplyUtils.muh>]
+#else
+    #pragma message("[MUSA HELPER] Using <ATen/musa/MUSA_PORT_ApplyUtils.muh> for torch_musa <= 2.0.0")
+    #include <ATen/musa/MUSA_PORT_ApplyUtils.muh>
+#endif
 
 static __host__ __device__ __forceinline__ int floor_div(int a, int b) {
   int c = a / b;

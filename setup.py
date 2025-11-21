@@ -2,7 +2,7 @@ import glob
 import os
 import platform
 import re
-from pkg_resources import DistributionNotFound, get_distribution
+from pkg_resources import DistributionNotFound, get_distribution, parse_version
 from setuptools import find_packages, setup
 
 EXT_TYPE = ''
@@ -294,6 +294,13 @@ def get_extensions():
             from torch_musa.testing import get_musa_arch
             define_macros += [('MMCV_WITH_MUSA', None),
                               ('MUSA_ARCH', str(get_musa_arch()))]
+            
+            import torch_musa
+            if parse_version(torch_musa.__version__.split("+")[0]) > parse_version('2.0.0'):
+                define_macros += [('TORCH_MUSA_2', '1')]
+            else:
+                define_macros += [('TORCH_MUSA_2', '0')]
+            
             os.environ['MUSA_ARCH'] = str(get_musa_arch())
             op_files = glob.glob('./mmcv/ops/csrc_musa/pytorch/*.cpp') + \
                 glob.glob('./mmcv/ops/csrc_musa/pytorch/cpu/*.cpp') + \
