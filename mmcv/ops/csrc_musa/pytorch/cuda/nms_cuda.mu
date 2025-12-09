@@ -49,5 +49,5 @@ Tensor NMSCUDAKernelLauncher(Tensor boxes, Tensor scores, float iou_threshold,
   }
 
   AT_MUSA_CHECK(musaGetLastError());
-  return order_t.masked_select(keep_t.to(at::kCUDA));
+  return order_t.masked_select(keep_t.to(at::kMUSA));
 }
