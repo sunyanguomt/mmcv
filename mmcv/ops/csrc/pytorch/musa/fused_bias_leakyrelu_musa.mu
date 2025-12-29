@@ -13,6 +13,11 @@
 #include <musa_runtime.h>
 #include <torch/types.h>
 
+
+// 判断 torch_musa 版本：
+// 如果版本 > 2.0.0，使用新的 MUSAApplyUtils.muh
+// 否则，使用 MUSA_Port_ApplyUtils.muh
+// ======================================================
 #if defined(TORCH_MUSA_2) && TORCH_MUSA_2
     #pragma message("[MUSA HELPER] Using <ATen/musa/MUSAApplyUtils.muh> for torch_musa > 2.0.0")
     #include <ATen/musa/MUSAApplyUtils.muh>]

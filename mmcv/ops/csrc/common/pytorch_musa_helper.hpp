@@ -25,4 +25,20 @@ using phalf = at::Half;
 #define __PHALF(x) (x)
 #define DIVUP(m, n) ((m) / (n) + ((m) % (n) > 0))
 
+// ======================================================
+// 判断 torch_musa 版本：
+// 如果版本 > 2.0.0，使用新的 MUSAApplyUtils.muh
+// 否则，使用 MUSA_Port_ApplyUtils.muh
+// ======================================================
+#if defined(TORCH_MUSA_2) && TORCH_MUSA_2
+    #pragma message("[MUSA HELPER] Using <ATen/musa/MUSAApplyUtils.muh> for torch_musa > 2.0.0")
+    #include <ATen/musa/MUSAApplyUtils.muh>
+#else
+    #pragma message("[MUSA HELPER] Using <ATen/musa/MUSA_PORT_ApplyUtils.muh> for torch_musa <= 2.0.0")
+    #include <ATen/musa/MUSA_PORT_ApplyUtils.muh>
+#endif
+
+
 #endif  // PYTORCH_CUDA_HELPER
+
+

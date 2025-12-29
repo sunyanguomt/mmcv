@@ -1,3 +1,21 @@
+For MUSA users, if you want to use version 2.x of MMCV, please follow the commands below to compile and install MMCV.
+```
+cd mmcv
+FORCE_MUSA=1 python setup.py install
+```
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+-------------------------
 <div align="center">
   <img src="https://raw.githubusercontent.com/open-mmlab/mmcv/main/docs/en/mmcv-logo.png" width="300"/>
   <div>&nbsp;</div>
