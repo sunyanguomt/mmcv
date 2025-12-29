@@ -154,11 +154,11 @@ __global__ void prepareSubMGridKernel(
   for (int i = 0; i < NDim; ++i) {
     spatialVolume *= outSpatialShape[i];
   }
-  Index index = 0;
+  int64_t index = 0;
   for (int ix : tv::KernelLoopX<int>(numActIn)) {
-    index = tv::rowArrayIdx<Index, NDim>(indicesIn.data() + ix * (NDim + 1) + 1,
-                                         outSpatialShape.data()) +
-            spatialVolume * indicesIn(ix, 0);
+    index = int64_t(tv::rowArrayIdx<Index, NDim>(indicesIn.data() + ix * (NDim + 1) + 1,
+                                         outSpatialShape.data())) +
+            int64_t(spatialVolume * int64_t(indicesIn(ix, 0)));
     gridsOut[index] = ix;
   }
 }
@@ -182,7 +182,7 @@ __global__ void getSubMIndicePairsKernel(
   Index numValidPoints = 0;
   Index validPoints[KernelMaxVolume * (NDim + 1)];
   Index *pointPtr = nullptr;
-  Index index = 0;
+  int64_t index = 0;
   for (int ix : tv::KernelLoopX<int>(numActIn)) {
     numValidPoints = getValidOutPos<Index, NDim>(
         indicesIn.data() + ix * (NDim + 1) + 1, kernelSize.data(),
@@ -191,8 +191,8 @@ __global__ void getSubMIndicePairsKernel(
     for (int i = 0; i < numValidPoints; ++i) {
       pointPtr = validPoints + i * (NDim + 1);
       auto offset = pointPtr[NDim];
-      index = tv::rowArrayIdx<Index, NDim>(pointPtr, outSpatialShape.data()) +
-              spatialVolume * indicesIn(ix, 0);
+      index = int64_t(tv::rowArrayIdx<Index, NDim>(pointPtr, outSpatialShape.data())) +
+              int64_t(spatialVolume * int64_t(indicesIn(ix, 0)));
       if (gridsOut[index] > -1) {
         auto oldNum = atomicAdd(indiceNum.data() + offset, Index(1));
         indicePairs(offset, 1, oldNum) = gridsOut[index];

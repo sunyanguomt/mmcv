@@ -325,17 +325,17 @@ struct Slice {
 };
 
 template <size_t MaxDim = TV_MAX_DIM>
-struct ShapeBase : public SimpleVector<int, MaxDim> {
-  TV_HOST_DEVICE_INLINE ShapeBase() : SimpleVector<int, MaxDim>() {};
-  TV_HOST_DEVICE_INLINE ShapeBase(std::initializer_list<int> shape)
-      : SimpleVector<int, MaxDim>(shape) {}
+struct ShapeBase : public SimpleVector<int64_t, MaxDim> {
+  TV_HOST_DEVICE_INLINE ShapeBase() : SimpleVector<int64_t, MaxDim>() {};
+  TV_HOST_DEVICE_INLINE ShapeBase(std::initializer_list<int64_t> shape)
+      : SimpleVector<int64_t, MaxDim>(shape) {}
 
   // TODO: find out why this template can no be used on windows
   // template <typename scalar_t, template <class...> class Container>
   // ShapeBase(Container<scalar_t> shape) : SimpleVector<int, MaxDim>(shape) {}
   TV_HOST_DEVICE_INLINE ShapeBase(const ShapeBase<MaxDim> &shape)
-      : SimpleVector<int, MaxDim>(shape) {}
-  ShapeBase(const std::vector<int> &arr) : SimpleVector<int, MaxDim>(arr) {}
+      : SimpleVector<int64_t, MaxDim>(shape) {}
+  ShapeBase(const std::vector<int64_t> &arr) : SimpleVector<int64_t, MaxDim>(arr) {}
 
   ShapeBase<MaxDim> &operator=(const ShapeBase<MaxDim> &shape) = default;
   TV_HOST_DEVICE_INLINE ShapeBase<MaxDim> subshape(int start, int end) const {
@@ -811,14 +811,14 @@ struct TensorView {
     return mPtr[((i1 * mShape[1] + i2) * mShape[2] + i3) * mShape[3] + i4];
   }
 
-  TV_HOST_DEVICE_INLINE scalar_t &operator[](int idx) {
+  TV_HOST_DEVICE_INLINE scalar_t &operator[](int64_t idx) {
 #ifdef TV_DEBUG
 #if defined(__CUDA_ARCH__)
     TV_DEVICE_REQUIRE(idx >= 0 && idx < size(),
-                      "index(%d) out-of-range: [0, %ld)\n", int(idx), size());
+                      "index(%ld) out-of-range: [0, %ld)\n", int64_t(idx), size());
 #else
-    TV_REQUIRE(idx >= 0 && idx < size(), "index(%d) out-of-range: [0, %ld)\n",
-               int(idx), size());
+    TV_REQUIRE(idx >= 0 && idx < size(), "index(%ld) out-of-range: [0, %ld)\n",
+               int64_t(idx), size());
 #endif
 #endif
     return mPtr[idx];
@@ -835,7 +835,7 @@ struct TensorView {
   TV_HOST_DEVICE_INLINE scalar_t *data() { return mPtr; }
   TV_HOST_DEVICE_INLINE const scalar_t *data() const { return mPtr; }
   TV_HOST_DEVICE_INLINE const Shape &shape() const { return mShape; }
-  TV_HOST_DEVICE_INLINE int dim(int idx) const { return mShape[idx]; }
+  TV_HOST_DEVICE_INLINE int64_t dim(int idx) const { return mShape[idx]; }
   TV_HOST_DEVICE_INLINE int ndim() const { return mShape.ndim(); }
   template <class... Inds>
   TV_HOST_DEVICE_INLINE TensorView<scalar_t, Rank> &reshape(Inds... newShapes) {
