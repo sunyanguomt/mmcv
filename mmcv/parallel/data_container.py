@@ -87,3 +87,16 @@ class DataContainer:
     @assert_tensor_type
     def dim(self):
         return self.data.dim()
+
+
+class PinableDataContainer(DataContainer):
+    def pin_memory(self):
+        if self.cpu_only:
+            return self
+        if isinstance(self._data, torch.Tensor) and self._data.device == torch.device("cpu"):
+            self._data = self._data.pin_memory()
+        elif isinstance(self._data, (list, tuple)):
+            self._data = type(self._data)(x.pin_memory() if isinstance(x, (torch.Tensor, PinableDataContainer)) else x for x in self._data)
+        elif isinstance(self._data, dict):
+            self._data = {k: v.pin_memory() if isinstance(v, (torch.Tensor, PinableDataContainer)) else v for k, v in self._data.items()}
+        return self
