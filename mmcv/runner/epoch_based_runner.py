@@ -14,6 +14,7 @@ from .base_runner import BaseRunner
 from .builder import RUNNERS
 from .checkpoint import save_checkpoint
 from .utils import get_host_info
+from mmcv.runner import get_dist_info
 
 
 @RUNNERS.register_module()
@@ -46,16 +47,19 @@ class EpochBasedRunner(BaseRunner):
         self._max_iters = self._max_epochs * len(self.data_loader)
         self.call_hook('before_train_epoch')
         time.sleep(2)  # Prevent possible deadlock during epoch transition
+        start_time = time.time()
         for i, data_batch in enumerate(self.data_loader):
             self.data_batch = data_batch
             self._inner_iter = i
-            self.call_hook('before_train_iter')
             self.run_iter(data_batch, train_mode=True, **kwargs)
             self.call_hook('after_train_iter')
             del self.data_batch
             self._iter += 1
-
         self.call_hook('after_train_epoch')
+        end_time = time.time()
+        rank, world_size = get_dist_info()
+        if rank == 0:
+            print(f'!!!!!!!!!!! train per batch_data cost time : {end_time - start_time} s, iters : {self._iter}')
         self._epoch += 1
 
     @torch.no_grad()

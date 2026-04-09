@@ -38,3 +38,15 @@ def is_mps_available() -> bool:
 
 
 IS_MPS_AVAILABLE = is_mps_available()
+
+
+def is_musa_available() -> bool:
+    """Return True if MUSA devices exist."""
+    try:
+        import torch
+        return hasattr(torch, 'musa') and torch.musa.is_available()
+    except Exception:
+        return False
+
+
+IS_MUSA_AVAILABLE = is_musa_available()

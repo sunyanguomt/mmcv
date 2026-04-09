@@ -37,6 +37,15 @@ def _get_cuda_home():
     return CUDA_HOME
 
 
+def _get_musa_home():
+    """Get MUSA_HOME path."""
+    try:
+        from torch_musa.utils.musa_extension import MUSA_HOME
+        return MUSA_HOME
+    except ImportError:
+        return None
+
+
 def get_build_config():
     if TORCH_VERSION == 'parrots':
         from parrots.config import get_build_info
@@ -67,10 +76,15 @@ def _get_extension():
         from parrots.utils.build_extension import BuildExtension, Extension
         CppExtension = partial(Extension, cuda=False)
         CUDAExtension = partial(Extension, cuda=True)
+        MUSAExtension = CUDAExtension  # fallback for parrots
+        return BuildExtension, CppExtension, CUDAExtension, MUSAExtension
     else:
-        from torch.utils.cpp_extension import (BuildExtension, CppExtension,
-                                               CUDAExtension)
-    return BuildExtension, CppExtension, CUDAExtension
+        from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
+        try:
+            from torch_musa.utils.musa_extension import MUSAExtension
+        except ImportError:
+            MUSAExtension = CUDAExtension  # fallback if torch_musa not available
+        return BuildExtension, CppExtension, CUDAExtension, MUSAExtension
 
 
 def _get_pool():
@@ -98,7 +112,7 @@ def _get_norm():
 
 _ConvNd, _ConvTransposeMixin = _get_conv()
 DataLoader, PoolDataLoader = _get_dataloader()
-BuildExtension, CppExtension, CUDAExtension = _get_extension()
+BuildExtension, CppExtension, CUDAExtension, MUSAExtension = _get_extension()
 _BatchNorm, _InstanceNorm, SyncBatchNorm_ = _get_norm()
 _AdaptiveAvgPoolNd, _AdaptiveMaxPoolNd, _AvgPoolNd, _MaxPoolNd = _get_pool()
 

@@ -49,7 +49,7 @@ class MMDistributedDataParallel(DistributedDataParallel):
                 logger='mmcv')
 
         if ('parrots' not in TORCH_VERSION
-                and digit_version(TORCH_VERSION) >= digit_version('1.11.0a0')):
+                and digit_version(TORCH_VERSION) >= digit_version('1.11.0')):
             if self._check_sync_bufs_pre_fwd():
                 self._sync_buffers()
         else:
@@ -69,7 +69,7 @@ class MMDistributedDataParallel(DistributedDataParallel):
             output = self.module.train_step(*inputs, **kwargs)
 
         if ('parrots' not in TORCH_VERSION
-                and digit_version(TORCH_VERSION) >= digit_version('1.11.0a0')):
+                and digit_version(TORCH_VERSION) >= digit_version('1.11.0')):
             if self._check_sync_bufs_post_fwd():
                 self._sync_buffers()
 
@@ -104,7 +104,7 @@ class MMDistributedDataParallel(DistributedDataParallel):
                 logger='mmcv')
 
         if ('parrots' not in TORCH_VERSION
-                and digit_version(TORCH_VERSION) >= digit_version('1.11.0a0')):
+                and digit_version(TORCH_VERSION) >= digit_version('1.11.0')):
             if self._check_sync_bufs_pre_fwd():
                 self._sync_buffers()
         else:
@@ -124,7 +124,7 @@ class MMDistributedDataParallel(DistributedDataParallel):
             output = self.module.val_step(*inputs, **kwargs)
 
         if ('parrots' not in TORCH_VERSION
-                and digit_version(TORCH_VERSION) >= digit_version('1.11.0a0')):
+                and digit_version(TORCH_VERSION) >= digit_version('1.11.0')):
             if self._check_sync_bufs_post_fwd():
                 self._sync_buffers()
 

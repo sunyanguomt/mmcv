@@ -13,7 +13,7 @@ from torch import distributed as dist
 from torch._utils import (_flatten_dense_tensors, _take_tensors,
                           _unflatten_dense_tensors)
 
-from mmcv.utils import IS_MLU_AVAILABLE
+from mmcv.utils import IS_MLU_AVAILABLE, IS_MUSA_AVAILABLE
 
 
 def _find_free_port() -> str:
@@ -58,6 +58,10 @@ def _init_dist_pytorch(backend: str, **kwargs) -> None:
             rank=rank,
             world_size=int(os.environ['WORLD_SIZE']),
             **kwargs)
+    elif IS_MUSA_AVAILABLE:
+        num_gpus = torch.musa.device_count()
+        torch.musa.set_device(rank % num_gpus)
+        dist.init_process_group(backend='mccl', **kwargs)
     else:
         num_gpus = torch.cuda.device_count()
         torch.cuda.set_device(rank % num_gpus)
@@ -66,7 +70,10 @@ def _init_dist_pytorch(backend: str, **kwargs) -> None:
 
 def _init_dist_mpi(backend: str, **kwargs) -> None:
     local_rank = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
-    torch.cuda.set_device(local_rank)
+    if IS_MUSA_AVAILABLE:
+        torch.musa.set_device(local_rank)
+    else:
+        torch.cuda.set_device(local_rank)
     if 'MASTER_PORT' not in os.environ:
         # 29500 is torch.distributed default port
         os.environ['MASTER_PORT'] = '29500'
@@ -91,8 +98,12 @@ def _init_dist_slurm(backend: str, port: Optional[int] = None) -> None:
     proc_id = int(os.environ['SLURM_PROCID'])
     ntasks = int(os.environ['SLURM_NTASKS'])
     node_list = os.environ['SLURM_NODELIST']
-    num_gpus = torch.cuda.device_count()
-    torch.cuda.set_device(proc_id % num_gpus)
+    if IS_MUSA_AVAILABLE:
+        num_gpus = torch.musa.device_count()
+        torch.musa.set_device(proc_id % num_gpus)
+    else:
+        num_gpus = torch.cuda.device_count()
+        torch.cuda.set_device(proc_id % num_gpus)
     addr = subprocess.getoutput(
         f'scontrol show hostname {node_list} | head -n1')
     # specify master port
