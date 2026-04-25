@@ -10,8 +10,8 @@ void ConvexIoUCUDAKernelLauncher(const Tensor pointsets, const Tensor polygons,
   int num_pointsets = pointsets.size(0);
   int num_polygons = polygons.size(0);
 
-  at::cuda::MUSAGuard device_guard(pointsets.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(pointsets.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       pointsets.scalar_type(), "convex_iou_cuda_kernel", ([&] {
         convex_iou_cuda_kernel<scalar_t>
@@ -19,7 +19,7 @@ void ConvexIoUCUDAKernelLauncher(const Tensor pointsets, const Tensor polygons,
                 num_pointsets, num_polygons, pointsets.data_ptr<scalar_t>(),
                 polygons.data_ptr<scalar_t>(), ious.data_ptr<scalar_t>());
       }));
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }
 
 void ConvexGIoUCUDAKernelLauncher(const Tensor pointsets, const Tensor polygons,
@@ -28,8 +28,8 @@ void ConvexGIoUCUDAKernelLauncher(const Tensor pointsets, const Tensor polygons,
   int num_pointsets = pointsets.size(0);
   int num_polygons = polygons.size(0);
 
-  at::cuda::MUSAGuard device_guard(pointsets.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(pointsets.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       pointsets.scalar_type(), "convex_giou_cuda_kernel", ([&] {
         convex_giou_cuda_kernel<scalar_t>
@@ -37,5 +37,5 @@ void ConvexGIoUCUDAKernelLauncher(const Tensor pointsets, const Tensor polygons,
                 num_pointsets, num_polygons, pointsets.data_ptr<scalar_t>(),
                 polygons.data_ptr<scalar_t>(), output.data_ptr<scalar_t>());
       }));
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }

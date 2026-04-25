@@ -13,7 +13,7 @@
 #include <musa_runtime.h>
 #include <torch/types.h>
 
-#include <ATen/musa/MUSA_PORT_ApplyUtils.muh>
+#include <ATen/musa/MUSAApplyUtils.muh>
 
 static __host__ __device__ __forceinline__ int floor_div(int a, int b) {
   int c = a / b;

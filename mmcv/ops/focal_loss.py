@@ -38,7 +38,7 @@ class SigmoidFocalLossFunction(Function):
                 weight: Optional[torch.Tensor] = None,
                 reduction: str = 'mean') -> torch.Tensor:
 
-assert isinstance(
+        assert isinstance(
             target, (torch.Tensor, torch.LongTensor, torch.cuda.LongTensor))
         assert target.dtype == torch.int64
         assert input.dim() == 2

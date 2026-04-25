@@ -142,7 +142,7 @@ class LoggerHook(Hook):
     def before_epoch(self, runner) -> None:
         runner.log_buffer.clear()  # clear logs of last epoch
 
-def before_train_iter(self, runner) -> None:
+    def before_train_iter(self, runner) -> None:
         runner.log_buffer.mode = 'train'
 
     def before_val_iter(self, runner) -> None:

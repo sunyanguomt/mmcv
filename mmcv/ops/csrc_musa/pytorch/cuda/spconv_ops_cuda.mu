@@ -1,4 +1,3 @@
-#include <cuda_runtime_api.h>
 #include <torch/script.h>
 #include <utils/spconv/spconv/indice.h>
 #include <utils/spconv/spconv/reordering.h>
@@ -13,7 +12,7 @@ std::vector<torch::Tensor> GetIndicePairsForwardCUDAKernelLauncher(
     std::vector<int64_t> kernelSize, std::vector<int64_t> stride,
     std::vector<int64_t> padding, std::vector<int64_t> dilation,
     std::vector<int64_t> outPadding, int64_t _subM, int64_t _transpose) {
-  at::cuda::MUSAGuard device_guard(indices.device());
+  at::musa::MUSAGuard device_guard(indices.device());
   bool subM = _subM != 0;
   bool transpose = _transpose != 0;
   auto numAct = indices.size(0);
@@ -130,7 +129,7 @@ std::vector<torch::Tensor> GetIndicePairsBackwardCUDAKernelLauncher(
     std::vector<int64_t> kernelSize, std::vector<int64_t> stride,
     std::vector<int64_t> padding, std::vector<int64_t> dilation,
     std::vector<int64_t> outPadding, int64_t _subM, int64_t _transpose) {
-  at::cuda::MUSAGuard device_guard(indices.device());
+  at::musa::MUSAGuard device_guard(indices.device());
   bool subM = _subM != 0;
   bool transpose = _transpose != 0;
   auto numAct = indices.size(0);
@@ -245,7 +244,7 @@ torch::Tensor IndiceConvForwardCUDAKernelLauncher(
     torch::Tensor features, torch::Tensor filters, torch::Tensor indicePairs,
     torch::Tensor indiceNum, int64_t numActOut, int64_t _inverse,
     int64_t _subM) {
-  at::cuda::MUSAGuard device_guard(features.device());
+  at::musa::MUSAGuard device_guard(features.device());
   bool subM = _subM != 0;
   bool inverse = _inverse != 0;
   auto device = features.device().type();
@@ -339,7 +338,7 @@ std::vector<torch::Tensor> IndiceConvBackwardCUDAKernelLauncher(
     torch::Tensor features, torch::Tensor filters, torch::Tensor outGrad,
     torch::Tensor indicePairs, torch::Tensor indiceNum, int64_t _inverse,
     int64_t _subM) {
-  at::cuda::MUSAGuard device_guard(features.device());
+  at::musa::MUSAGuard device_guard(features.device());
   bool subM = _subM != 0;
   bool inverse = _inverse != 0;
 

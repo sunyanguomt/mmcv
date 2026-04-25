@@ -26,7 +26,7 @@ def scatter(input: Union[List, Tensor],
         # TODO: copy to a pinned buffer first (if copying from CPU)
         stream = streams[0] if output.numel() > 0 else None
         if devices != [-1]:
-if hasattr(torch, 'musa') and (torch.musa.is_available() or os.getenv('FORCE_MUSA', '0') == '1'):
+            if hasattr(torch, 'musa') and (torch.musa.is_available() or os.getenv('FORCE_MUSA', '0') == '1'):
                 with torch.musa.device(devices[0]), torch.musa.stream(stream):
                     output = output.musa(devices[0], non_blocking=True)
             else:
@@ -66,7 +66,7 @@ def get_input_device(input: Union[List, Tensor]) -> int:
             if input_device != -1:
                 return input_device
         return -1
-elif isinstance(input, Tensor):
+    elif isinstance(input, Tensor):
         if hasattr(torch, 'musa') and (torch.musa.is_available() or os.getenv('FORCE_MUSA', '0') == '1'):
             return input.get_device() if input.is_musa else -1
         return input.get_device() if input.is_cuda else -1

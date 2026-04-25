@@ -10,8 +10,8 @@ void RiROIAlignRotatedForwardCUDAKernelLauncher(
     at::Tensor output) {
   const int output_size =
       num_rois * pooled_height * pooled_width * channels * num_orientations;
-  at::cuda::MUSAGuard device_guard(features.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(features.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       features.scalar_type(), "riroi_align_rotated_forward_cuda_kernel", ([&] {
         const scalar_t *bottom_data = features.data_ptr<scalar_t>();
@@ -25,7 +25,7 @@ void RiROIAlignRotatedForwardCUDAKernelLauncher(
                 pooled_width, num_orientations, top_data);
       }));
 
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }
 
 void RiROIAlignRotatedBackwardCUDAKernelLauncher(
@@ -36,8 +36,8 @@ void RiROIAlignRotatedBackwardCUDAKernelLauncher(
     at::Tensor bottom_grad) {
   const int output_size =
       num_rois * pooled_height * pooled_width * channels * num_orientations;
-  at::cuda::MUSAGuard device_guard(top_grad.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(top_grad.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       top_grad.scalar_type(), "riroi_align_rotated_backward_cuda_kernel", ([&] {
         const scalar_t *top_diff = top_grad.data_ptr<scalar_t>();
@@ -49,5 +49,5 @@ void RiROIAlignRotatedBackwardCUDAKernelLauncher(
                 clockwise, channels, height, width, pooled_height, pooled_width,
                 num_orientations, bottom_diff);
       }));
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }

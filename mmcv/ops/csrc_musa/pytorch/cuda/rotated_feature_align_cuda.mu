@@ -9,8 +9,8 @@ void RotatedFeatureAlignForwardCUDAKernelLauncher(const Tensor features,
                                                   const float spatial_scale,
                                                   const int points,
                                                   Tensor output) {
-  at::cuda::MUSAGuard device_guard(features.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(features.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   const int output_size = features.numel();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       features.scalar_type(), "rotated_feature_align_forward_cuda_kernel",
@@ -25,7 +25,7 @@ void RotatedFeatureAlignForwardCUDAKernelLauncher(const Tensor features,
                 scalar_t(spatial_scale), features.size(1), features.size(2),
                 features.size(3), top_data);
       }));
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }
 
 void RotatedFeatureAlignBackwardCUDAKernelLauncher(const Tensor top_grad,
@@ -33,8 +33,8 @@ void RotatedFeatureAlignBackwardCUDAKernelLauncher(const Tensor top_grad,
                                                    const float spatial_scale,
                                                    const int points,
                                                    Tensor bottom_grad) {
-  at::cuda::MUSAGuard device_guard(top_grad.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(top_grad.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   const int output_size = top_grad.numel();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       top_grad.scalar_type(), "rotated_feature_align_backward_cuda_kernel",
@@ -49,5 +49,5 @@ void RotatedFeatureAlignBackwardCUDAKernelLauncher(const Tensor top_grad,
                 scalar_t(spatial_scale), top_grad.size(1), top_grad.size(2),
                 top_grad.size(3), bottom_diff);
       }));
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }

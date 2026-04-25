@@ -8,8 +8,8 @@
 at::Tensor DiffIoURotatedSortVerticesCUDAKernelLauncher(at::Tensor vertices,
                                                         at::Tensor mask,
                                                         at::Tensor num_valid) {
-  at::cuda::MUSAGuard device_guard(vertices.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(vertices.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
 
   CHECK_CONTIGUOUS(vertices);
   CHECK_CONTIGUOUS(mask);
@@ -29,7 +29,7 @@ at::Tensor DiffIoURotatedSortVerticesCUDAKernelLauncher(at::Tensor vertices,
                                                        stream>>>(
       b, n, m, vertices.data_ptr<float>(), mask.data_ptr<bool>(),
       num_valid.data_ptr<int>(), idx.data_ptr<int>());
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 
   return idx;
 }

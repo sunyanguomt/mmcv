@@ -23,7 +23,7 @@ class LogBuffer:
         self._mode = None
         self.ready = False
 
-@property
+    @property
     def mode(self):
         return self._mode
 

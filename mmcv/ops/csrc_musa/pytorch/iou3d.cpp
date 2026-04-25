@@ -26,15 +26,16 @@ void iou3d_boxes_iou_bev_forward_impl(const int num_a, const Tensor boxes_a,
                        boxes_b, ans_iou);
 }
 
-void iou3d_nms_forward_impl(const Tensor boxes, unsigned long long *mask,
-                            int boxes_num, float nms_overlap_thresh) {
-  DISPATCH_DEVICE_IMPL(iou3d_nms_forward_impl, boxes, mask, boxes_num,
+void iou3d_nms3d_forward_impl(const Tensor boxes, unsigned long long *mask,
+                              int boxes_num, float nms_overlap_thresh) {
+  DISPATCH_DEVICE_IMPL(iou3d_nms3d_forward_impl, boxes, mask, boxes_num,
                        nms_overlap_thresh);
 }
 
-void iou3d_nms_normal_forward_impl(const Tensor boxes, unsigned long long *mask,
-                                   int boxes_num, float nms_overlap_thresh) {
-  DISPATCH_DEVICE_IMPL(iou3d_nms_normal_forward_impl, boxes, mask, boxes_num,
+void iou3d_nms3d_normal_forward_impl(const Tensor boxes,
+                                     unsigned long long *mask, int boxes_num,
+                                     float nms_overlap_thresh) {
+  DISPATCH_DEVICE_IMPL(iou3d_nms3d_normal_forward_impl, boxes, mask, boxes_num,
                        nms_overlap_thresh);
 }
 
@@ -62,9 +63,9 @@ void iou3d_boxes_iou_bev_forward(Tensor boxes_a, Tensor boxes_b,
   iou3d_boxes_iou_bev_forward_impl(num_a, boxes_a, num_b, boxes_b, ans_iou);
 }
 
-void iou3d_nms_forward(Tensor boxes, Tensor keep, Tensor keep_num,
-                       float nms_overlap_thresh) {
-  // params boxes: (N, 5) [x1, y1, x2, y2, ry]
+void iou3d_nms3d_forward(Tensor boxes, Tensor keep, Tensor keep_num,
+                         float nms_overlap_thresh) {
+  // params boxes: (N, 7) [x, y, z, dx, dy, dz, heading]
   // params keep: (N)
   CHECK_CONTIGUOUS(boxes);
   CHECK_CONTIGUOUS(keep);
@@ -79,7 +80,7 @@ void iou3d_nms_forward(Tensor boxes, Tensor keep, Tensor keep_num,
       at::empty({boxes_num, col_blocks}, boxes.options().dtype(at::kLong));
   unsigned long long *mask_data =
       (unsigned long long *)mask.data_ptr<int64_t>();
-  iou3d_nms_forward_impl(boxes, mask_data, boxes_num, nms_overlap_thresh);
+  iou3d_nms3d_forward_impl(boxes, mask_data, boxes_num, nms_overlap_thresh);
 
   at::Tensor mask_cpu = mask.to(at::kCPU);
   unsigned long long *mask_host =
@@ -105,9 +106,9 @@ void iou3d_nms_forward(Tensor boxes, Tensor keep, Tensor keep_num,
   }
 }
 
-void iou3d_nms_normal_forward(Tensor boxes, Tensor keep, Tensor keep_num,
-                              float nms_overlap_thresh) {
-  // params boxes: (N, 5) [x1, y1, x2, y2, ry]
+void iou3d_nms3d_normal_forward(Tensor boxes, Tensor keep, Tensor keep_num,
+                                float nms_overlap_thresh) {
+  // params boxes: (N, 7) [x, y, z, dx, dy, dz, heading]
   // params keep: (N)
 
   CHECK_CONTIGUOUS(boxes);
@@ -123,8 +124,8 @@ void iou3d_nms_normal_forward(Tensor boxes, Tensor keep, Tensor keep_num,
       at::empty({boxes_num, col_blocks}, boxes.options().dtype(at::kLong));
   unsigned long long *mask_data =
       (unsigned long long *)mask.data_ptr<int64_t>();
-  iou3d_nms_normal_forward_impl(boxes, mask_data, boxes_num,
-                                nms_overlap_thresh);
+  iou3d_nms3d_normal_forward_impl(boxes, mask_data, boxes_num,
+                                  nms_overlap_thresh);
 
   at::Tensor mask_cpu = mask.to(at::kCPU);
   unsigned long long *mask_host =

@@ -12,6 +12,10 @@ if torch.__version__ == 'parrots':
 
     def get_compiling_cuda_version():
         return parrots.version.cuda
+
+    def get_compiling_musa_version():
+        # MUSA-compatible builds reuse the same extension ABI entry.
+        return get_compiling_cuda_version()
 else:
     from ..utils import ext_loader
     ext_module = ext_loader.load_ext(
@@ -22,6 +26,10 @@ else:
 
     def get_compiling_cuda_version():
         return ext_module.get_compiling_cuda_version()
+
+    def get_compiling_musa_version():
+        # MUSA-compatible builds reuse the same extension ABI entry.
+        return get_compiling_cuda_version()
 
 
 def get_onnxruntime_op_path():

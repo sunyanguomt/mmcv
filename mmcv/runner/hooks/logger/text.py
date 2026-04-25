@@ -108,7 +108,7 @@ class TextLoggerHook(LoggerHook):
 
     def _get_max_memory(self, runner) -> int:
         device = getattr(runner.model, 'output_device', None)
-if torch.cuda.is_available():
+        if torch.cuda.is_available():
             mem = torch.cuda.max_memory_allocated(device=device)
         elif hasattr(torch, 'musa') and torch.musa.is_available():
             mem = torch.musa.max_memory_allocated(device=device)

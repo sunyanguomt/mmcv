@@ -52,7 +52,7 @@ void IoU3DBoxesIoUBevForwardCUDAKernelLauncher(const int num_a,
   AT_MUSA_CHECK(musaGetLastError());
 }
 
-void IoU3DNMSForwardCUDAKernelLauncher(const Tensor boxes,
+void IoU3DNMS3DForwardCUDAKernelLauncher(const Tensor boxes,
                                        unsigned long long *mask, int boxes_num,
                                        float nms_overlap_thresh) {
   at::musa::MUSAGuard device_guard(boxes.device());
@@ -68,7 +68,7 @@ void IoU3DNMSForwardCUDAKernelLauncher(const Tensor boxes,
   AT_MUSA_CHECK(musaGetLastError());
 }
 
-void IoU3DNMSNormalForwardCUDAKernelLauncher(const Tensor boxes,
+void IoU3DNMS3DNormalForwardCUDAKernelLauncher(const Tensor boxes,
                                              unsigned long long *mask,
                                              int boxes_num,
                                              float nms_overlap_thresh) {

@@ -1,4 +1,3 @@
-#include <cuda_runtime_api.h>
 #include <torch/script.h>
 #include <utils/spconv/spconv/maxpool.h>
 
@@ -9,7 +8,7 @@ torch::Tensor IndiceMaxpoolForwardCUDAKernelLauncher(torch::Tensor features,
                                                      torch::Tensor indicePairs,
                                                      torch::Tensor indiceNum,
                                                      int64_t numAct) {
-  at::cuda::MUSAGuard device_guard(features.device());
+  at::musa::MUSAGuard device_guard(features.device());
   auto device = features.device().type();
   auto kernelVolume = indicePairs.size(0);
   auto numInPlanes = features.size(1);
@@ -49,7 +48,7 @@ torch::Tensor IndiceMaxpoolBackwardCUDAKernelLauncher(torch::Tensor features,
                                                       torch::Tensor outGrad,
                                                       torch::Tensor indicePairs,
                                                       torch::Tensor indiceNum) {
-  at::cuda::MUSAGuard device_guard(features.device());
+  at::musa::MUSAGuard device_guard(features.device());
   auto device = features.device().type();
   auto numInPlanes = features.size(1);
   auto indicePairNumCpu = indiceNum.to({torch::kCPU});

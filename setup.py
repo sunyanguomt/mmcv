@@ -3,8 +3,18 @@ import os
 import platform
 import re
 import warnings
-from pkg_resources import DistributionNotFound, get_distribution
 from setuptools import find_packages, setup
+
+try:
+    from importlib.metadata import distribution, PackageNotFoundError
+    def get_distribution(name):
+        try:
+            return distribution(name)
+        except PackageNotFoundError:
+            return None
+    DistributionNotFound = PackageNotFoundError
+except ImportError:
+    from pkg_resources import DistributionNotFound, get_distribution
 
 EXT_TYPE = ''
 try:
@@ -297,7 +307,7 @@ def get_extensions():
             extension = CUDAExtension
             include_dirs.append(os.path.abspath('./mmcv/ops/csrc/common'))
             include_dirs.append(os.path.abspath('./mmcv/ops/csrc/common/cuda'))
-elif (hasattr(torch, 'is_mlu_available') and
+        elif (hasattr(torch, 'is_mlu_available') and
                 torch.is_mlu_available()) or \
                 os.getenv('FORCE_MLU', '0') == '1':
             from torch_mlu.utils.cpp_extension import MLUExtension

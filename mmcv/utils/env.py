@@ -149,7 +149,7 @@ def collect_env():
     try:
         from mmcv.ops import get_compiling_musa_version
         env_info['MMCV MUSA Compiler'] = get_compiling_musa_version()
-    except (ModuleNotFoundError, AttributeError):
+    except (ModuleNotFoundError, ImportError, AttributeError):
         env_info['MMCV MUSA Compiler'] = 'n/a'
 
     return env_info

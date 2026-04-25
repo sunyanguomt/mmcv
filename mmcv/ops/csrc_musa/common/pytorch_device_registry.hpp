@@ -130,7 +130,7 @@ auto Dispatch(const R& registry, const char* name, Args&&... args) {
 #define REGISTER_DEVICE_IMPL(key, device, value)           \
   struct key##_##device##_registerer {                     \
     key##_##device##_registerer() {                        \
-      DEVICE_REGISTRY(key).Register(at::k##device, value); \
+      DEVICE_REGISTRY(key).Register(at::DeviceType::device, value); \
     }                                                      \
   };                                                       \
   static key##_##device##_registerer _##key##_##device##_registerer;

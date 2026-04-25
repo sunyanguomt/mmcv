@@ -12,8 +12,8 @@ void PointsInPolygonsForwardCUDAKernelLauncher(const at::Tensor points,
                                                const int rows, const int cols,
                                                at::Tensor output) {
   const int output_size = rows * cols;
-  at::cuda::MUSAGuard device_guard(points.device());
-  musaStream_t stream = at::cuda::getCurrentMUSAStream();
+  at::musa::MUSAGuard device_guard(points.device());
+  musaStream_t stream = at::musa::getCurrentMUSAStream();
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
       points.scalar_type(), "points_in_polygons_forward_cuda_kernel", ([&] {
         const scalar_t *vertex1 = points.data_ptr<scalar_t>();
@@ -24,5 +24,5 @@ void PointsInPolygonsForwardCUDAKernelLauncher(const at::Tensor points,
             <<<GET_BLOCKS(output_size), THREADS_PER_BLOCK, 0, stream>>>(
                 output_size, vertex1, vertex2, rows, cols, inside_flag);
       }));
-  AT_MUSA_CHECK(cudaGetLastError());
+  AT_MUSA_CHECK(musaGetLastError());
 }

@@ -32,6 +32,8 @@ std::string get_compiling_cuda_version() {
 #endif
 }
 
+std::string get_compiling_musa_version() { return get_compiling_cuda_version(); }
+
 // similar to
 // https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/Version.cpp
 std::string get_compiler_version() {

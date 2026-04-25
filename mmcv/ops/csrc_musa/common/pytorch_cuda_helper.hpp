@@ -5,7 +5,7 @@
 #include "torch_musa/csrc/aten/musa/MUSAContext.h"
 #include "torch_musa/csrc/core/MUSAGuard.h"
 
-#include <ATen/musa/MUSA_PORT_ApplyUtils.muh>
+#include <ATen/musa/MUSAApplyUtils.muh>
 #include <THC/THCAtomics.muh>
 
 #include "common_cuda_helper.hpp"
