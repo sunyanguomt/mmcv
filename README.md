@@ -74,6 +74,34 @@ Note: MMCV requires Python 3.6+.
 
 ## Installation
 
+### Install this MUSA version from source
+
+Use this branch when the target environment already has `torch`, `torch_musa`,
+and the MUSA runtime installed, and you want to build the MUSA-enabled
+`mmcv-full` package from this source tree:
+
+```shell
+cd /home/repositories/mmcv
+MMCV_WITH_OPS=1 FORCE_MUSA=1 python -m pip install -v -e . --no-deps --no-build-isolation
+```
+
+The repository also provides a shortcut:
+
+```shell
+cd /home/repositories/mmcv
+bash install.sh
+```
+
+Verify the installation:
+
+```shell
+python -c "import mmcv; print(mmcv.__version__); from mmcv.ops import get_compiling_musa_version; print(get_compiling_musa_version())"
+```
+
+Do not install the upstream CUDA wheel in the same environment together with
+this MUSA build. Uninstall any existing `mmcv` or `mmcv-full` package before
+building this branch if they point to a different source tree.
+
 There are two versions of MMCV:
 
 - **mmcv-full**: comprehensive, with full features and various CUDA ops out of box. It takes longer time to build.
